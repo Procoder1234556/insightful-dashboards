@@ -93,6 +93,6 @@ export function groupByTwo(rows: DataRow[], groupBy: string, seriesField: string
       const match = rows.find(r => String(r[groupBy]) === group && String(r[seriesField]) === series);
       entry[series] = match ? Number(match[valueField]) : 0;
     });
-    return entry as Record<string, DataRow>;
+    return entry;
   });
 }
