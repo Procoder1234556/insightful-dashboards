@@ -82,7 +82,7 @@ export function CommandBar({ onSubmit, isLoading }: CommandBarProps) {
             onKeyDown={handleKeyDown}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            placeholder="Ask anything about your data… e.g. "Show Q3 sales by region""
+            placeholder='Ask anything about your data... e.g. "Show Q3 sales by region"'
             className="flex-1 resize-none bg-transparent text-sm font-body text-foreground placeholder:text-muted-foreground outline-none min-h-[42px] max-h-[120px] leading-relaxed py-1"
             rows={1}
             style={{ height: "auto", overflowY: "hidden" }}
