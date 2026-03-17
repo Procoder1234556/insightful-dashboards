@@ -17,7 +17,7 @@ export interface AIResponse {
 }
 
 // Replace this with your actual deployed Python API URL (e.g., on Render or Railway)
-const API_BASE_URL = "https://your-python-backend.onrender.com";
+const API_BASE_URL = "https://web-production-a75ed.up.railway.app";
 
 export const fetchDashboardData = async (
   userPrompt: string, 
