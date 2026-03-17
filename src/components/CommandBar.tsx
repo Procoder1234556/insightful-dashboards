@@ -99,17 +99,17 @@ export function CommandBar({ onSubmit, isLoading }: CommandBarProps) {
         <button
           onClick={handleSubmit}
           disabled={!value.trim() || isLoading}
-          className={`absolute right-3 bottom-3 w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
+          className={[
+            "absolute right-3 bottom-3 w-8 h-8 rounded-xl flex items-center justify-center transition-all",
             value.trim() && !isLoading
               ? "bg-primary text-primary-foreground shadow-glow hover:opacity-90 active:scale-95 pulse-active"
-              : "bg-muted text-muted-foreground cursor-not-allowed"
-          }`}
+              : "bg-muted text-muted-foreground cursor-not-allowed",
+          ].join(" ")}
         >
-          {isLoading ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <ArrowUp className="w-3.5 h-3.5" />
-          )}
+          {isLoading
+            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            : <ArrowUp className="w-3.5 h-3.5" />
+          }
         </button>
       </motion.div>
 
