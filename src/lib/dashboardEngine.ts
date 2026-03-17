@@ -231,12 +231,16 @@ function buildQ3RegionDashboard(dataset: Dataset, query: string): DashboardSpec 
 function buildTopPerformersDashboard(dataset: Dataset, query: string): DashboardSpec {
   const productData = SAMPLE_PRODUCT_DATA;
   const totalRevByProduct = productData
-    .map(p => ({ ...p, total_revenue: Number(p.q1_revenue) + Number(p.q2_revenue) + Number(p.q3_revenue) }))
+    .map(p => ({
+      product: String(p.product),
+      category: String(p.category),
+      total_revenue: Number(p.q1_revenue) + Number(p.q2_revenue) + Number(p.q3_revenue),
+    }))
     .sort((a, b) => b.total_revenue - a.total_revenue);
 
   const quarterlyComparison = productData.map(p => ({
     product: String(p.product).substring(0, 12),
-    Q1: p.q1_revenue, Q2: p.q2_revenue, Q3: p.q3_revenue,
+    Q1: Number(p.q1_revenue), Q2: Number(p.q2_revenue), Q3: Number(p.q3_revenue),
   }));
 
   const top = totalRevByProduct[0];
