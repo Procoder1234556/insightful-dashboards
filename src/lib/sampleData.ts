@@ -84,7 +84,7 @@ export function aggregateByField(rows: DataRow[], groupBy: string, valueField: s
   return Object.entries(map).map(([k, v]) => ({ [groupBy]: k, [valueField]: Math.round(v) }));
 }
 
-export function groupByTwo(rows: DataRow[], groupBy: string, seriesField: string, valueField: string): Record<string, DataRow>[] {
+export function groupByTwo(rows: DataRow[], groupBy: string, seriesField: string, valueField: string): DataRow[] {
   const seriesValues = [...new Set(rows.map(r => String(r[seriesField])))];
   const groupValues = [...new Set(rows.map(r => String(r[groupBy])))];
   return groupValues.map(group => {
