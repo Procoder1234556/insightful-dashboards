@@ -79,7 +79,20 @@ export default function Index() {
 
           <h1 className="font-display font-extrabold text-5xl sm:text-6xl lg:text-7xl text-foreground leading-[1.08] tracking-tight mb-6">
             Turn questions into<br />
-            <span className="gradient-text">living dashboards</span>
+            <span className="relative inline-block" style={{ minHeight: "1.1em" }}>
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={phraseIndex}
+                  initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, y: -14, filter: "blur(4px)" }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="gradient-text inline-block"
+                >
+                  {ROTATING_PHRASES[phraseIndex]}
+                </motion.span>
+              </AnimatePresence>
+            </span>
           </h1>
 
           <p className="text-muted-foreground text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto mb-10 font-body">
