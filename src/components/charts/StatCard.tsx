@@ -33,17 +33,17 @@ export function StatCard({ chart, delay = 0 }: StatCardProps) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="surface-raised p-5 flex flex-col gap-3 h-full"
+      className="surface-raised p-3 sm:p-5 flex flex-col gap-2 sm:gap-3 h-full"
     >
-      <p className="text-sm font-body font-medium text-muted-foreground leading-tight">{chart.title}</p>
+      <p className="text-xs font-body font-medium text-muted-foreground leading-tight">{chart.title}</p>
 
       {label && !chart.format ? (
         <div className="flex-1 flex items-center">
-          <span className="text-2xl font-display font-bold text-foreground leading-none">{label}</span>
+          <span className="text-lg sm:text-2xl font-display font-bold text-foreground leading-none">{label}</span>
         </div>
       ) : (
         <div className="flex-1 flex items-end">
-          <span className="text-3xl font-display font-bold text-foreground leading-none tabular-nums">
+          <span className="text-2xl sm:text-3xl font-display font-bold text-foreground leading-none tabular-nums">
             {formatValue(value, chart.format)}
           </span>
         </div>
