@@ -1,7 +1,17 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { ArrowRight, Sparkles, BarChart2, TrendingUp, PieChart, Zap, Upload, MessageSquare } from "lucide-react";
 import heroVisual from "@/assets/hero-visual.png";
+
+const ROTATING_PHRASES = [
+  "living dashboards",
+  "instant insights",
+  "real-time charts",
+  "data stories",
+  "business clarity",
+  "smart analytics",
+];
 
 const DEMO_QUERIES = [
   "Show Q3 revenue by region and highlight top category",
@@ -20,6 +30,15 @@ const FEATURES = [
 
 export default function Index() {
   const navigate = useNavigate();
+  const [phraseIndex, setPhraseIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPhraseIndex(i => (i + 1) % ROTATING_PHRASES.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
@@ -60,7 +79,20 @@ export default function Index() {
 
           <h1 className="font-display font-extrabold text-5xl sm:text-6xl lg:text-7xl text-foreground leading-[1.08] tracking-tight mb-6">
             Turn questions into<br />
-            <span className="gradient-text">living dashboards</span>
+            <span className="relative inline-block" style={{ minHeight: "1.1em" }}>
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={phraseIndex}
+                  initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, y: -14, filter: "blur(4px)" }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="gradient-text inline-block"
+                >
+                  {ROTATING_PHRASES[phraseIndex]}
+                </motion.span>
+              </AnimatePresence>
+            </span>
           </h1>
 
           <p className="text-muted-foreground text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto mb-10 font-body">
