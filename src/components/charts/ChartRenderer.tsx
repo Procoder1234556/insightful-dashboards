@@ -52,22 +52,22 @@ export function ChartRenderer({ chart, delay = 0 }: ChartRendererProps) {
       initial={{ opacity: 0, scale: 0.97, y: 6 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 0.25, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="surface-raised p-5 flex flex-col gap-3 h-full min-h-0"
+      className="surface-raised p-3 sm:p-5 flex flex-col gap-2 sm:gap-3 h-full min-h-0"
     >
       <div>
-        <h3 className="text-sm font-display font-semibold text-foreground leading-tight">{chart.title}</h3>
-        {chart.subtitle && <p className="text-xs text-muted-foreground mt-0.5">{chart.subtitle}</p>}
+        <h3 className="text-xs sm:text-sm font-display font-semibold text-foreground leading-tight">{chart.title}</h3>
+        {chart.subtitle && <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">{chart.subtitle}</p>}
       </div>
 
-      <div className="flex-1 min-h-0" style={{ minHeight: chart.size.rows === 2 ? 220 : 120 }}>
+      <div className="flex-1 min-h-0" style={{ minHeight: chart.size.rows === 2 ? 200 : 100 }}>
         {chart.type === "bar" && (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chart.data} margin={{ top: 4, right: 8, bottom: 8, left: 0 }} barSize={chart.data.length > 6 ? 20 : 32}>
+            <BarChart data={chart.data} margin={{ top: 4, right: 4, bottom: 8, left: 0 }} barSize={chart.data.length > 6 ? 16 : 28}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(214 32% 91%)" vertical={false} />
-              <XAxis dataKey={chart.xKey} tick={{ fontSize: 11, fontFamily: "DM Sans", fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} />
-              <YAxis tickFormatter={(v) => formatTick(v, chart.format)} tick={{ fontSize: 10, fontFamily: "DM Sans", fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} width={52} />
+              <XAxis dataKey={chart.xKey} tick={{ fontSize: 10, fontFamily: "DM Sans", fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} />
+              <YAxis tickFormatter={(v) => formatTick(v, chart.format)} tick={{ fontSize: 9, fontFamily: "DM Sans", fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} width={44} />
               <Tooltip content={<CustomTooltip format={chart.format} />} cursor={{ fill: "hsl(239 84% 67% / 0.06)" }} />
-              {chart.yKeys.length > 1 && <Legend wrapperStyle={{ fontSize: 11, fontFamily: "DM Sans" }} />}
+              {chart.yKeys.length > 1 && <Legend wrapperStyle={{ fontSize: 10, fontFamily: "DM Sans" }} />}
               {chart.yKeys.map((key, i) => (
                 <Bar key={key} dataKey={key} fill={colors[i % colors.length]} radius={[3, 3, 0, 0]} />
               ))}
@@ -77,12 +77,12 @@ export function ChartRenderer({ chart, delay = 0 }: ChartRendererProps) {
 
         {chart.type === "line" && (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chart.data} margin={{ top: 4, right: 8, bottom: 8, left: 0 }}>
+            <LineChart data={chart.data} margin={{ top: 4, right: 4, bottom: 8, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(214 32% 91%)" vertical={false} />
-              <XAxis dataKey={chart.xKey} tick={{ fontSize: 11, fontFamily: "DM Sans", fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} />
-              <YAxis tickFormatter={(v) => formatTick(v, chart.format)} tick={{ fontSize: 10, fontFamily: "DM Sans", fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} width={52} />
+              <XAxis dataKey={chart.xKey} tick={{ fontSize: 10, fontFamily: "DM Sans", fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} />
+              <YAxis tickFormatter={(v) => formatTick(v, chart.format)} tick={{ fontSize: 9, fontFamily: "DM Sans", fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} width={44} />
               <Tooltip content={<CustomTooltip format={chart.format} />} />
-              <Legend wrapperStyle={{ fontSize: 11, fontFamily: "DM Sans" }} />
+              <Legend wrapperStyle={{ fontSize: 10, fontFamily: "DM Sans" }} />
               {chart.yKeys.map((key, i) => (
                 <Line key={key} type="monotone" dataKey={key} stroke={colors[i % colors.length]} strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} />
               ))}
@@ -92,7 +92,7 @@ export function ChartRenderer({ chart, delay = 0 }: ChartRendererProps) {
 
         {chart.type === "area" && (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chart.data} margin={{ top: 4, right: 8, bottom: 8, left: 0 }}>
+            <AreaChart data={chart.data} margin={{ top: 4, right: 4, bottom: 8, left: 0 }}>
               <defs>
                 {chart.yKeys.map((key, i) => (
                   <linearGradient key={key} id={`grad-${key}-${chart.id}`} x1="0" y1="0" x2="0" y2="1">
@@ -102,10 +102,10 @@ export function ChartRenderer({ chart, delay = 0 }: ChartRendererProps) {
                 ))}
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(214 32% 91%)" vertical={false} />
-              <XAxis dataKey={chart.xKey} tick={{ fontSize: 11, fontFamily: "DM Sans", fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} />
-              <YAxis tickFormatter={(v) => formatTick(v, chart.format)} tick={{ fontSize: 10, fontFamily: "DM Sans", fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} width={52} />
+              <XAxis dataKey={chart.xKey} tick={{ fontSize: 10, fontFamily: "DM Sans", fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} />
+              <YAxis tickFormatter={(v) => formatTick(v, chart.format)} tick={{ fontSize: 9, fontFamily: "DM Sans", fill: "hsl(215 16% 47%)" }} axisLine={false} tickLine={false} width={44} />
               <Tooltip content={<CustomTooltip format={chart.format} />} />
-              {chart.yKeys.length > 1 && <Legend wrapperStyle={{ fontSize: 11, fontFamily: "DM Sans" }} />}
+              {chart.yKeys.length > 1 && <Legend wrapperStyle={{ fontSize: 10, fontFamily: "DM Sans" }} />}
               {chart.yKeys.map((key, i) => (
                 <Area key={key} type="monotone" dataKey={key} stroke={colors[i % colors.length]} strokeWidth={2} fill={`url(#grad-${key}-${chart.id})`} dot={false} />
               ))}
@@ -131,14 +131,14 @@ export function ChartRenderer({ chart, delay = 0 }: ChartRendererProps) {
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip format={chart.format} />} />
-              <Legend wrapperStyle={{ fontSize: 11, fontFamily: "DM Sans" }} iconType="circle" iconSize={8} />
+              <Legend wrapperStyle={{ fontSize: 10, fontFamily: "DM Sans" }} iconType="circle" iconSize={8} />
             </PieChart>
           </ResponsiveContainer>
         )}
       </div>
 
       {chart.insight && (
-        <p className="text-xs text-primary font-medium border-t border-border pt-2.5 leading-snug">
+        <p className="text-[11px] sm:text-xs text-primary font-medium border-t border-border pt-2 sm:pt-2.5 leading-snug">
           💡 {chart.insight}
         </p>
       )}
