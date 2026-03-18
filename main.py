@@ -22,7 +22,7 @@ app = FastAPI(title="Insightful Dashboards API")
 # --- 1. CORS CONFIGURATION ---
 # Ismein tera Vercel URL aur Localhost dono allowed hain
 origins = [
-    "https://insightful-dashboard-beryl.vercel.app",
+    "https://insightful-dashboards1.vercel.app",
     "http://localhost:8080",
     "http://localhost:5173",
     "*" # Safety net for hackathon, allows all if others fail
