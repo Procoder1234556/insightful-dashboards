@@ -3,54 +3,65 @@ import json
 import os
 
 def get_query_plan(prompt, columns):
-    # API Key configure karo
-    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+    """
+    Never-Say-No Engine: 
+    Ye AI ko force karta hai ki wo dataset ke columns ko prompt se map kare.
+    """
+    # 1. Gemini Configure karo
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return {"error": "API Key missing in Railway environment variables"}
+        
+    genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-1.5-flash')
     
-    # AI ko expert analyst banao jo kisi bhi file ko samajh sake
+    # 2. System Prompt: AI ko "Expert Analyst" banane ke liye
     sys_prompt = f"""
-    You are a Senior Data Scientist. Analyze the following columns from a user-uploaded CSV:
-    Columns: {columns}
-    Table Name: 'data_table'
-
-    INSTRUCTIONS:
-    1. If the user prompt is a generic dashboard button (e.g., 'Gender', 'Income'), find the closest matching column from the list.
-    2. For 'chart_type', choose 'bar' for categories, 'line' for trends, or 'scatter' for correlations.
-    3. Ensure the SQL is valid SQLite. Always use 'data_table'.
-    4. If the user asks for 'Analysis' or 'Overview', pick the most interesting numerical column and group it by a categorical column.
+    You are a Data Analyst Expert. 
+    Table: 'data_table'
+    Columns available: {columns}
     
-    RETURN ONLY A VALID JSON OBJECT:
+    RULES:
+    1. NEVER return an error or say "I cannot answer".
+    2. Map the user's keywords to the closest available columns.
+    3. If they ask for 'Online' vs 'Store', use the relevant spend or order columns.
+    4. If the user's query is vague, pick the first categorical column for X and first numerical for Y.
+    5. Return ONLY a valid JSON object for SQLite.
+
+    JSON STRUCTURE:
     {{
         "sql": "SELECT...",
-        "chart_type": "bar/line/pie/scatter",
-        "x": "column_name_for_x_axis",
-        "y": "column_name_for_y_axis",
-        "title": "A very professional and descriptive title",
-        "insight": "A deep business insight based on what this data represents"
+        "chart_type": "bar" or "line" or "pie",
+        "x": "column_name",
+        "y": "column_name",
+        "title": "Analysis Title",
+        "insight": "Quick business summary"
     }}
     """
     
     try:
-        # Prompt aur System Instruction dono bhej rahe hain
-        response = model.generate_content([sys_prompt, f"User Request: {prompt}"])
+        # 3. AI se content generate karvao
+        response = model.generate_content([sys_prompt, f"User Query: {prompt}"])
+        text = response.text.strip()
         
-        # Clean JSON logic
-        text = response.text
+        # 4. Robust JSON Extraction (Markdown tags hatao)
         if "```json" in text:
             text = text.split("```json")[1].split("```")[0]
         elif "```" in text:
             text = text.split("```")[1].split("```")[0]
         
-        clean_text = text.strip()
-        return json.loads(clean_text)
+        return json.loads(text.strip())
         
     except Exception as e:
-        # Fallback: Agar AI confuse ho jaye, toh pehle do columns ka default chart dikhao
+        # 5. Emergency Fallback: Agar AI crash ho jaye, toh default data dikhao
+        print(f"AI Engine Error: {e}")
+        # Default categorical column dhoondo (usually gender or city_tier)
+        default_x = columns[-1] if columns else "Data"
         return {
-            "sql": f"SELECT {columns[0]}, COUNT(*) as count FROM data_table GROUP BY {columns[0]} LIMIT 10",
+            "sql": f"SELECT {default_x}, COUNT(*) as count FROM data_table GROUP BY {default_x} LIMIT 5",
             "chart_type": "bar",
-            "x": columns[0],
+            "x": default_x,
             "y": "count",
-            "title": "Data Overview",
-            "insight": "AI could not parse the specific request, showing a general distribution."
+            "title": "General Data Overview",
+            "insight": "AI was unsure about the specific query, showing a general distribution of the dataset."
         }

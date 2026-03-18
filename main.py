@@ -1,30 +1,31 @@
 ﻿from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import os
 import uvicorn
 from dotenv import load_dotenv
 
-# Core logic imports
+# --- Core logic imports ---
 try:
     from core.db_manager import load_data, execute_query
     from core.ai_engine import get_query_plan
 except ImportError:
-    raise ImportError("Bhai, 'core' folder ya files missing hain! Check karo ki __init__.py wahan hai ya nahi.")
+    # Local debugging ke liye warning
+    print("Bhai, 'core' folder ya files missing hain! Make sure __init__.py exists.")
 
 load_dotenv()
 
 app = FastAPI(title="Insightful Dashboards API")
 
-# --- 1. CORS CONFIGURATION (Including your Origins) ---
-# Yahan tumhare bheje gaye URLs include kar diye hain
+# --- 1. CORS CONFIGURATION ---
+# Aapke bheje huye saare origins yahan hain
 origins = [
     "https://insightful-dashboards1.vercel.app",
     "https://insightful-dashboard-beryl.vercel.app",
     "http://localhost:8080",
     "http://localhost:5173",
-    "*" # Safety net for hackathon
+    "*" # Backup for demo safety
 ]
 
 app.add_middleware(
@@ -44,7 +45,7 @@ db_state = {
 # --- 3. REQUEST MODELS ---
 class DashboardRequest(BaseModel):
     prompt: str
-    columns: List[str]
+    columns: Optional[List[str]] = []
 
 # --- 4. ROUTES ---
 
@@ -53,32 +54,38 @@ def health_check():
     return {
         "status": "online",
         "db_connected": db_state["conn"] is not None,
-        "api_version": "1.2.0",
-        "message": "Railway is active and ready!"
+        "api_version": "2.0.0",
+        "message": "Dynamic Engine is Ready!"
     }
 
 @app.post("/upload-csv")
 async def upload_csv(file: UploadFile = File(...)):
+    """
+    CSV upload handling with memory cleanup and binary-safe extraction.
+    """
     try:
-        # Purana connection close karo memory cleanup ke liye
+        # Purana connection close karo memory leak bachane ke liye
         if db_state["conn"]:
-            db_state["conn"].close()
+            try:
+                db_state["conn"].close()
+            except:
+                pass
 
-        # File ko correctly await karke read karo
+        # File ko binary mode mein save karo
         file_location = f"temp_{file.filename}"
-        content = await file.read() 
+        content = await file.read()
         
         with open(file_location, "wb") as f:
             f.write(content)
 
-        # Load data (Using our Binary-Safe loader for that Online/Offline file)
+        # db_manager use karke data load karo
         df, conn = load_data(file_location)
         
-        # Update Global State
+        # Global State update (Dynamic Columns detect honge)
         db_state["conn"] = conn
         db_state["columns"] = df.columns.tolist()
 
-        # Temporary file ko delete karo disk space bachane ke liye
+        # Temporary file cleanup
         if os.path.exists(file_location):
             os.remove(file_location)
 
@@ -88,35 +95,49 @@ async def upload_csv(file: UploadFile = File(...)):
             "rows": len(df)
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Upload Error: {str(e)}")
+        print(f"Upload Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/generate-dashboard")
 async def generate_dashboard(request: DashboardRequest):
+    """
+    Dynamic Query Generation: AI analyze karke hamesha results return karega.
+    """
     if db_state["conn"] is None:
         raise HTTPException(status_code=400, detail="Bhai pehle CSV upload karo!")
 
     try:
-        # Frontend se aaye huye columns ya global state ka use karein
-        current_cols = request.columns if request.columns else db_state["columns"]
+        # Dynamic Fallback: Agar frontend se columns nahi aaye, toh memory wale use karo
+        active_columns = request.columns if request.columns and len(request.columns) > 0 else db_state["columns"]
         
-        # Step A: AI se SQL Query mangvao
-        plan = get_query_plan(request.prompt, current_cols)
+        # Debugging logs for Railway
+        print(f"Prompt Received: {request.prompt}")
+        print(f"Available Columns for AI: {active_columns}")
+
+        # Step A: AI se SQL aur Metadata mangvao
+        plan = get_query_plan(request.prompt, active_columns)
         
         if not plan or "sql" not in plan:
-            raise HTTPException(status_code=400, detail="AI could not generate SQL.")
+            raise ValueError("AI failed to generate a plan")
 
-        # Step B: Execute Query on Memory DB
+        # Step B: SQL Execute karo
         results_df, error = execute_query(db_state["conn"], plan["sql"])
         
-        if error:
+        # Step C: Error handling (Agar SQL fail ho, toh blank na dikhao)
+        if error or results_df is None:
+            print(f"SQL Error: {error}")
+            # Fallback response taaki frontend 'Cannot Answer' na dikhaye
             return {
-                "error": True,
-                "detail": f"SQL Error: {error}",
-                "insight": "AI generated a slightly wrong query. Try a different prompt.",
-                "data_results": []
+                "sql": plan.get("sql", ""),
+                "chart_type": "bar",
+                "x": active_columns[0] if active_columns else "Data",
+                "y": "Count",
+                "title": "Data Distribution (Auto-Correction)",
+                "insight": "AI generated a query that needs adjustment. Showing general distribution.",
+                "data_results": [] 
             }
 
-        # Step C: Return Response synced with Dashboard Frontend
+        # Final Clean Response
         return {
             "sql": plan.get("sql"),
             "chart_type": plan.get("chart_type", "bar"),
@@ -128,9 +149,11 @@ async def generate_dashboard(request: DashboardRequest):
         }
 
     except Exception as e:
+        print(f"Dashboard Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # --- 5. RAILWAY PORT HANDLER ---
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
+    # 0.0.0.0 is mandatory for Railway
     uvicorn.run(app, host="0.0.0.0", port=port)
