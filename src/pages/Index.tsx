@@ -1,7 +1,17 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { ArrowRight, Sparkles, BarChart2, TrendingUp, PieChart, Zap, Upload, MessageSquare } from "lucide-react";
 import heroVisual from "@/assets/hero-visual.png";
+
+const ROTATING_PHRASES = [
+  "living dashboards",
+  "instant insights",
+  "real-time charts",
+  "data stories",
+  "business clarity",
+  "smart analytics",
+];
 
 const DEMO_QUERIES = [
   "Show Q3 revenue by region and highlight top category",
