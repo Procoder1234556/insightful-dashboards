@@ -25,14 +25,14 @@ export function DashboardGrid({ spec }: DashboardGridProps) {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="surface-raised p-4 sm:p-6 flex items-start gap-4"
+        className="surface-raised p-4 flex items-start gap-4"
       >
-        <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center flex-shrink-0">
           <AlertTriangle className="w-5 h-5 text-amber-500" />
         </div>
         <div>
-          <h3 className="font-display font-semibold text-foreground">Cannot Answer This Query</h3>
-          <p className="text-sm text-muted-foreground mt-1">{spec.cannotAnswerReason}</p>
+          <h3 className="font-display font-semibold text-foreground text-sm">Cannot Answer This Query</h3>
+          <p className="text-xs text-muted-foreground mt-1">{spec.cannotAnswerReason}</p>
           <p className="text-xs text-muted-foreground mt-2">Try: "Show revenue by region" or "What are the top products by revenue?"</p>
         </div>
       </motion.div>
@@ -49,22 +49,22 @@ export function DashboardGrid({ spec }: DashboardGridProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="space-y-3 sm:space-y-4 w-full"
+        className="space-y-3 w-full"
       >
-        {/* Summary Header */}
+        {/* Summary Header — mobile card style */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="flex items-start gap-3"
+          className="surface-raised p-3 sm:p-4 flex items-start gap-3"
         >
-          <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Sparkles className="w-3.5 h-3.5 text-primary" />
+          <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center flex-shrink-0 shadow-glow">
+            <Sparkles className="w-4 h-4 text-primary-foreground" />
           </div>
-          <div>
-            <h2 className="font-display font-bold text-foreground text-base sm:text-lg leading-tight">{spec.title}</h2>
+          <div className="flex-1 min-w-0">
+            <h2 className="font-display font-bold text-foreground text-sm sm:text-base leading-tight">{spec.title}</h2>
             <p
-              className="text-xs sm:text-sm text-muted-foreground mt-1 leading-relaxed"
+              className="text-xs text-muted-foreground mt-1 leading-relaxed"
               dangerouslySetInnerHTML={{
                 __html: spec.summary.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>'),
               }}
@@ -72,7 +72,7 @@ export function DashboardGrid({ spec }: DashboardGridProps) {
           </div>
         </motion.div>
 
-        {/* Stat Cards Row */}
+        {/* Stat Cards — 2-col on mobile, 4-col on desktop */}
         {statCharts.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
             {statCharts.map((chart, i) => (
@@ -81,9 +81,9 @@ export function DashboardGrid({ spec }: DashboardGridProps) {
           </div>
         )}
 
-        {/* Main Charts — mobile-first single col, scales up */}
+        {/* Data Charts — single col mobile, responsive desktop */}
         {dataCharts.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 auto-rows-[minmax(200px,auto)]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 auto-rows-[minmax(180px,auto)]">
             {dataCharts.map((chart, i) => {
               const cs = responsiveColSpan(chart.size.cols);
               const rs = rowSpan(chart.size.rows);
@@ -91,7 +91,7 @@ export function DashboardGrid({ spec }: DashboardGridProps) {
                 <div
                   key={chart.id}
                   className={[cs, rs, "min-h-0"].filter(Boolean).join(" ")}
-                  style={{ minHeight: chart.size.rows >= 2 ? 240 : 160 }}
+                  style={{ minHeight: chart.size.rows >= 2 ? 220 : 160 }}
                 >
                   <ChartRenderer chart={chart} delay={(statCharts.length + i) * 0.05} />
                 </div>
